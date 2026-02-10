@@ -124,4 +124,4 @@ SELECT  s.FullName, c.coursename, e.enrollmentdate
 FROM enrollments e
 INNER JOIN Students s ON e.StudentID = s.StudentID
 INNER JOIN course c ON e.courseid = c.courseid
-WHERE e.enrollmentdate = (SELECT MAX(enrollmentdate) FROM dbo.enrollments);
+WHERE e.enrollmentdate = (SELECT MAX(enrollmentdate) FROM enrollments);
