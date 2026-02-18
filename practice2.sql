@@ -33,116 +33,207 @@ INSERT INTO RetailSales VALUES
 (19, 'Bikash Rana',  'Biratnagar','Laptop',       'Electronics', 1, 80000, '2025-02-11'),
 (20, 'Suman Karki',  'Kathmandu', 'Mouse',        'Electronics', 4, 1200,  '2025-02-12');
 
---Find the total number of sales records for each City.--
-select  City,count(*) as no_of_records from RetailSales
+--level 1--
+
+-- 1. Display total quantity sold for each ProductName.
+SELECT ProductName, SUM(Quantity) AS TotalQuantity
+FROM RetailSales
+GROUP BY ProductName;
+
+
+-- 2. Show total sales amount (Quantity * UnitPrice) for each ProductName.
+SELECT ProductName, SUM(Quantity * UnitPrice) AS TotalSalesAmount
+FROM RetailSales
+GROUP BY ProductName;
+
+
+-- 3. Find the total number of sales records for each City.
+SELECT City, COUNT(*) AS TotalSalesRecords
+FROM RetailSales
 GROUP BY City;
 
---Display total quantity sold for each ProductName.--
-select  Productname,count(*) as no_of_records from RetailSales
-GROUP BY Productname;
 
-select distinct city from Retailsales
-select distinct productname, customername from retailsales
-
-select distinct category, customername from retailsales 
-where customername like 's%' order by customername desc
+-- 4. Display the total quantity sold by each CustomerName.
+SELECT CustomerName, SUM(Quantity) AS TotalQuantity
+FROM RetailSales
+GROUP BY CustomerName;
 
 
-select distinct customername,productname, unitprice from retailsales
-where unitprice >= 5000 order by customername;
+-- 5. Show category-wise total quantity sold.
+SELECT Category, SUM(Quantity) AS TotalQuantity
+FROM RetailSales
+GROUP BY Category;
 
 
-select category, sum(quantity) total_qty, sum(unitprice) total_sales from retailsales group by category
-
-select category, max(quantity), max(unitprice) from retailsales group by category
-
-select productname, sum(quantity) as unit_sold from retailsales group by productname;
-
-select productname, sum(quantity * unitprice) as sales_amount from retailsales group by productname;
-
-select city, count(city) as total_sales from retailsales group by city;
-
-select customername, sum(quantity) as quantity_sold from retailsales group by customername;
+-- 6. Find the minimum unit price for each Category.
+SELECT Category, MIN(UnitPrice) AS MinimumUnitPrice
+FROM RetailSales
+GROUP BY Category;
 
 
-select category, min(unitprice) as minprice from retailsales group by category;
-
-select productname, count(*) as times_sold from retailsales group by productname;
-
-
-select productname, count(*) as totalsales from retailsales group by productname
-having count(*) >3
-
---difference betwn where and having--
+-- 7. Display the maximum unit price for each ProductName.
+SELECT ProductName, MAX(UnitPrice) AS MaximumUnitPrice
+FROM RetailSales
+GROUP BY ProductName;
 
 
-select customername, sum(unitprice * quantity) as purchase_amt from retailsales group by customername 
-having sum(unitprice * quantity) > 100000
-order by purchase_amt DESC;
+-- 8. Show the average unit price of products for each Category.
+SELECT Category, AVG(UnitPrice) AS AverageUnitPrice
+FROM RetailSales
+GROUP BY Category;
 
 
-select customername, sum(unitprice * quantity) as purchase_amt from retailsales group by customername 
-having sum(unitprice * quantity) > 100000
-order by 2 DESC;
+-- 9. Display total sales amount for each City.
+SELECT City, SUM(Quantity * UnitPrice) AS TotalSalesAmount
+FROM RetailSales
+GROUP BY City;
 
 
---duplicate name--
-SELECT customername, COUNT(*) AS totalcount FROM retailsales
-GROUP BY customername
-HAVING COUNT(*) > 1;
-
---top 3 product based on total sales amount--
-select top 3 productname , sum(quantity * unitprice) as totalsales from retailsales
-group by productname
-order by 2 DESC
-
---display customer whose total electronic spending is greater that funiture spending--
-
-select customername, sum( case when category= 'electronics' then unitprice * quantity else 0 END) as electronic_spending,
-sum( case when category= 'furniture' then unitprice * quantity else 0 END) as furniture_spending
-from retailsales  group by customername
-having 
-sum( case when category= 'electronics' then unitprice * quantity else 0 END)  >
-sum( case when category= 'furniture' then unitprice * quantity else 0 END)+11
-order by customername ASC
-
---top2--
-select top 2 customername,
-sum( case when category= 'electronics' then unitprice * quantity else 0 END) as electronic_spending,
-sum( case when category= 'furniture' then unitprice * quantity else 0 END) as furniture_spending
-from retailsales  group by customername
-having 
-sum( case when category= 'electronics' then unitprice * quantity else 0 END)  >
-sum( case when category= 'furniture' then unitprice * quantity else 0 END)
-order by 2 DESC
+-- 10. Count how many times each ProductName was sold.
+SELECT ProductName, COUNT(*) AS TimesSold
+FROM RetailSales
+GROUP BY ProductName;
 
 
---display cities whose highest single sale amount is greater than 80000--
-SELECT City, max(quantity * unitprice) as highest_single_sale_amt from retailsales
-group by city
-having max(quantity * unitprice) > 60000.00
+--level-2--
 
---display total quantity sold for each productname in each city--
-select city,productname, sum(quantity) as quantity_sold from retailsales
-group by city, productname;
-
---find the customers and categories where total spending exceeds 50000--
-SELECT customername, category, sum(quantity * unitprice) as total_spending from retailsales
-group by customername, category
-having sum(quantity * unitprice) > 50000
-
---show cities and products sold on more than one diff day--
-select  city, productname,
- COUNT(DISTINCT SaleDate) AS NumberOfDiffday from retailsales
-group by city, productname
-HAVING COUNT(DISTINCT SaleDate) > 1
-
---Find products that were sold in more than one city.--
-SELECT ProductName,
-COUNT(DISTINCT City) AS NumberOfCities,
-SUM(Quantity) AS TotalQuantitySold,
-SUM(Quantity * UnitPrice) AS TotalRevenue
+-- 1. Display products whose total quantity sold is greater than 3.
+SELECT ProductName, SUM(Quantity) AS TotalQuantity
 FROM RetailSales
 GROUP BY ProductName
-HAVING COUNT(DISTINCT City) > 1
-ORDER BY NumberOfCities DESC, TotalRevenue DESC;
+HAVING SUM(Quantity) > 3;
+
+
+-- 2. Find customers whose total purchase amount exceeds 100,000.
+SELECT CustomerName, SUM(Quantity * UnitPrice) AS TotalPurchaseAmount
+FROM RetailSales
+GROUP BY CustomerName
+HAVING SUM(Quantity * UnitPrice) > 100000;
+
+
+-- 3. Show cities where total sales amount is more than 150,000.
+SELECT City, SUM(Quantity * UnitPrice) AS TotalSalesAmount
+FROM RetailSales
+GROUP BY City
+HAVING SUM(Quantity * UnitPrice) > 150000;
+
+
+-- 4. Display categories having more than 5 items sold in total.
+SELECT Category, SUM(Quantity) AS TotalItemsSold
+FROM RetailSales
+GROUP BY Category
+HAVING SUM(Quantity) > 5;
+
+
+-- 5. Find products that were sold more than 2 times.
+SELECT ProductName, COUNT(*) AS TimesSold
+FROM RetailSales
+GROUP BY ProductName
+HAVING COUNT(*) > 2;
+
+
+-- 6. Display customers who purchased more than 5 items in total.
+SELECT CustomerName, SUM(Quantity) AS TotalItemsPurchased
+FROM RetailSales
+GROUP BY CustomerName
+HAVING SUM(Quantity) > 5;
+
+
+-- 7. Show categories whose average unit price is greater than 20,000.
+SELECT Category, AVG(UnitPrice) AS AverageUnitPrice
+FROM RetailSales
+GROUP BY Category
+HAVING AVG(UnitPrice) > 20000;
+
+
+-- 8. Display cities having more than 3 sales records.
+SELECT City, COUNT(*) AS TotalSalesRecords
+FROM RetailSales
+GROUP BY City
+HAVING COUNT(*) > 3;
+
+
+-- 9. Find products whose total sales amount exceeds 50,000.
+SELECT ProductName, SUM(Quantity * UnitPrice) AS TotalSalesAmount
+FROM RetailSales
+GROUP BY ProductName
+HAVING SUM(Quantity * UnitPrice) > 50000;
+
+
+-- 10. Show customers who have made more than one purchase.
+SELECT CustomerName, COUNT(*) AS PurchaseCount
+FROM RetailSales
+GROUP BY CustomerName
+HAVING COUNT(*) > 1;
+
+
+--level3--
+
+-- 1. Display customers who purchased products from more than one category.
+SELECT CustomerName, COUNT(DISTINCT Category) AS CategoryCount
+FROM RetailSales
+GROUP BY CustomerName
+HAVING COUNT(DISTINCT Category) > 1;
+
+
+-- 2. Find products that were sold in more than one city.
+SELECT ProductName, COUNT(DISTINCT City) AS CityCount
+FROM RetailSales
+GROUP BY ProductName
+HAVING COUNT(DISTINCT City) > 1;
+
+
+-- 3. Display cities where more than 2 different products were sold.
+SELECT City, COUNT(DISTINCT ProductName) AS ProductCount
+FROM RetailSales
+GROUP BY City
+HAVING COUNT(DISTINCT ProductName) > 2;
+
+
+-- 4. Find categories having more than 2 different products sold.
+SELECT Category, COUNT(DISTINCT ProductName) AS ProductCount
+FROM RetailSales
+GROUP BY Category
+HAVING COUNT(DISTINCT ProductName) > 2;
+
+
+-- 5. Display customers whose average purchase amount per sale is greater than 30,000.
+SELECT CustomerName, AVG(Quantity * UnitPrice) AS AvgPurchaseAmount
+FROM RetailSales
+GROUP BY CustomerName
+HAVING AVG(Quantity * UnitPrice) > 30000;
+
+
+-- 6. Show products where average quantity per sale is greater than 2.
+SELECT ProductName, AVG(Quantity) AS AvgQuantity
+FROM RetailSales
+GROUP BY ProductName
+HAVING AVG(Quantity) > 2;
+
+
+-- 7. Find customers who made purchases on more than one date.
+SELECT CustomerName, COUNT(DISTINCT SaleDate) AS PurchaseDates
+FROM RetailSales
+GROUP BY CustomerName
+HAVING COUNT(DISTINCT SaleDate) > 1;
+
+
+-- 8. Display products sold on more than 3 different days.
+SELECT ProductName, COUNT(DISTINCT SaleDate) AS SaleDays
+FROM RetailSales
+GROUP BY ProductName
+HAVING COUNT(DISTINCT SaleDate) > 3;
+
+
+-- 9. Show cities where customers purchased both Electronics and Furniture.
+SELECT City
+FROM RetailSales
+GROUP BY City
+HAVING COUNT(DISTINCT Category) = 2;
+
+
+-- 10. Find customers who bought the same product more than once.
+SELECT CustomerName, ProductName, COUNT(*) AS PurchaseCount
+FROM RetailSales
+GROUP BY CustomerName, ProductName
+HAVING COUNT(*) > 1;
