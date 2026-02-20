@@ -28,6 +28,9 @@ foreign key(studentId) references Students_aashish(StudentId),
 foreign key(courseId) references courses_aashish(courseId)
 )
 
+
+
+
 --ques-2--
 use CollegeExamDB_Aashish
 
@@ -68,3 +71,50 @@ where marks < 40;
 
 delete from enrollments_aashish 
 where courseId is null;
+
+
+
+
+--question 3--
+use CollegeExamDB_Aashish
+
+SELECT s.StudentId,s.FullName,s.Email,s.Department,e.marks
+FROM students_aashish s
+Inner JOIN enrollments_aashish e ON s.StudentId = e.studentId
+where e.marks > (SELECT AVG(marks) FROM enrollments_aashish Where marks IS NOT NULL)
+order BY e.marks DESC;
+
+SELECT c.coursename,COUNT(Distinct e.studentId) AS NumberOfStudents
+FROM courses_aashish c
+LEFT Join enrollments_aashish e ON c.courseId = e.courseId
+GROUP BY c.coursename
+order BY NumberOfStudents DESC;
+
+
+SELECT c.coursename,s.StudentId,s.FullName,s.Email, s.Department,e.marks AS HighestMark
+FROM dbo.courses_aashish c
+inner Join enrollments_aashish e ON c.courseId = e.courseId
+inner Join students_aashish s ON e.studentId = s.StudentId
+WHERE e.marks = (SELECT MAX(marks) 
+FROM enrollments_aashish e2 
+where e2.courseId = c.courseId AND e2.marks IS NOT NULL
+)
+order BY c.coursename;
+
+
+SELECT s.StudentId,s.FullName,    s.Email,s.Department,
+COUNT(DISTINCT e.courseId) AS NumberOfCourses
+FROM students_aashish s
+inner Join enrollments_aashish e ON s.StudentId = e.studentId
+GROUP BY s.StudentId, s.FullName, s.Email, s.Department
+having COUNT(DISTINCT e.courseId) > 1
+order BY NumberOfCourses DESC, s.FullName;
+
+
+
+SELECT    s.StudentId, s.FullName, s.Email s.Department,e.courseId, c.coursename,  e.marks
+FROM dbo.students_aashish s
+inner Join enrollments_aashish e ON s.StudentId = e.studentId
+inner Join courses_aashish c ON e.courseId = c.courseId
+AND e.marks IS NOT NULL
+order BY e.marks DESC;
